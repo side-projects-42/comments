@@ -5,21 +5,35 @@
 
   $.comments = function(el) {
     this.target = $(el);
+
     this.form = $('<form></form>').attr({
       action: "<%= comments_url(:format => 'xml') %>",
       method: "post"
     });
+
     this.token = $("<input />").attr({
       name: 'authenticity_token', type: 'hidden',
       value: "<%= form_authenticity_token %>"
     });
     this.form.append(this.token);
+
+    this.name = $("<input />").attr({ name: 'comment[name]', type: 'text' });
+    this.form.append(this.name);
+    this.name.wrap("<div class='comment_name' />");
+
+    this.body = $("<textarea />").attr({ name: 'comment[body]' });
+    this.form.append(this.body);
+    this.body.wrap("<div class='comment_body' />");
+
+    button = $("<input type='submit' value='Submit' />");
+    this.form.append(button);
+    button.wrap("<div class='comment_submit' />");
+
     this.target.html(this.form);
   }
 
   $.extend($.comments.prototype, {
-    target: null,
-    form: null,
-    token: null
+    target: null, form: null, token: null,
+    name: null, body: null
   });
 })(jQuery);
