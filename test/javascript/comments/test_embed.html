@@ -11,7 +11,18 @@
         obj.comments();
 
         test("form creation", function() {
-          equals( obj.find('form').length, 1 )
+          form = obj.find('form');
+          equals( form.length, 1 );
+          equals( form.attr('action'), "http://localhost:3000/comments.xml" );
+          equals( form.attr('method'), "post" );
+        });
+
+        test("form elements", function() {
+          form = obj.find('form');
+          token = form.find('input[name=authenticity_token]');
+          equals( token.length, 1 );
+          equals( token.attr('type'), 'hidden' );
+          ok( token.val().match(/^.{44}$/) );
         });
       });
     </script>

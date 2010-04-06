@@ -1,3 +1,25 @@
-jQuery.fn.comments = function() {
-  this.html("<form></form>");
-}
+(function($) {
+  $.fn.comments = function() {
+    return this.each(function() { new $.comments(this); });
+  };
+
+  $.comments = function(el) {
+    this.target = $(el);
+    this.form = $('<form></form>').attr({
+      action: "<%= comments_url(:format => 'xml') %>",
+      method: "post"
+    });
+    this.token = $("<input />").attr({
+      name: 'authenticity_token', type: 'hidden',
+      value: "<%= form_authenticity_token %>"
+    });
+    this.form.append(this.token);
+    this.target.html(this.form);
+  }
+
+  $.extend($.comments.prototype, {
+    target: null,
+    form: null,
+    token: null
+  });
+})(jQuery);
