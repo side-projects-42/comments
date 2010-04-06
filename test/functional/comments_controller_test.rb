@@ -46,4 +46,9 @@ class CommentsControllerTest < ActionController::TestCase
 
     assert_redirected_to comments_path
   end
+
+  test "embed content type" do
+    get :embed
+    assert_equal "text/javascript", @response.content_type
+  end
 end

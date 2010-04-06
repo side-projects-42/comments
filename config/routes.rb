@@ -1,6 +1,6 @@
 Comments::Application.routes.draw do |map|
+  get "comments/embed.js" => "comments#embed"
   resources :comments
-
   get "home/index"
 
   # The priority is based upon order of creation:

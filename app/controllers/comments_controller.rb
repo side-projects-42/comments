@@ -80,4 +80,8 @@ class CommentsController < ApplicationController
       format.xml  { head :ok }
     end
   end
+
+  def embed
+    render :template => "comments/embed.js.erb"
+  end
 end
