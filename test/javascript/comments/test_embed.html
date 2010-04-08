@@ -9,24 +9,29 @@
       $(function() {
         obj = $('#comments');
         obj.comments();
+        form = obj.find('form');
 
         test("form creation", function() {
-          form = obj.find('form');
           equals( form.length, 1 );
           equals( form.attr('action'), "http://localhost:3000/comments.xml" );
           equals( form.attr('method'), "post" );
         });
 
         test("authenticity token", function() {
-          form = obj.find('form');
           token = form.find('input[name=authenticity_token]');
           equals( token.length, 1 );
           equals( token.attr('type'), 'hidden' );
           ok( token.val().match(/^.{44}$/) );
         });
 
+        test("url", function() {
+          url = form.find('input[name="comment[url]"]');
+          equals( url.length, 1 );
+          equals( url.attr('type'), 'hidden' );
+          equals( url.val(), document.location.href );
+        });
+
         test("input fields", function() {
-          form = obj.find('form');
           ok( form.find('input[name="comment[name]"][type=text]').length > 0 );
           ok( form.find('textarea[name="comment[body]"]').length > 0 );
           ok( form.find('input[type=submit]').length > 0 );

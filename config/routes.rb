@@ -1,4 +1,6 @@
 Comments::Application.routes.draw do |map|
+  resources :sites
+
   get "comments/embed.js" => "comments#embed"
   resources :comments
   get "home/index"

@@ -2,13 +2,18 @@ require 'test_helper'
 
 class CommentsControllerTest < ActionController::TestCase
   setup do
-    @comment = comments(:one)
+    @comment = Factory(:comment)
   end
 
   test "should get index" do
-    get :index
+    site = Factory(:site)
+    comment_1 = Factory(:comment, :site => site, :url => "http://example.org/foo")
+    comment_2 = Factory(:comment, :site => site, :url => "http://example.org/bar")
+    comment_3 = Factory(:comment, :url => "http://example.org/foo")
+
+    get :index, :format => :json, :site_key => site.token, :url => "http://example.org/foo"
     assert_response :success
-    assert_not_nil assigns(:comments)
+    assert_equal [comment_1], assigns(:comments)
   end
 
   test "should get new" do
@@ -17,11 +22,25 @@ class CommentsControllerTest < ActionController::TestCase
   end
 
   test "should create comment" do
+    site = Factory(:site)
     assert_difference('Comment.count') do
-      post :create, :comment => @comment.attributes
+      post :create, {
+        :format => 'json',
+        :comment => Factory.attributes_for(:comment, :site_key => site.token)
+      }
     end
+    assert_response :success
+    assert_equal site, assigns(:comment).site
+  end
 
-    assert_redirected_to comment_path(assigns(:comment))
+  test "failed comment creation" do
+    assert_no_difference('Comment.count') do
+      post :create, {
+        :format => 'json',
+        :comment => Factory.attributes_for(:comment, :name => nil)
+      }
+    end
+    assert_response 422
   end
 
   test "should show comment" do

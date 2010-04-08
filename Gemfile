@@ -24,3 +24,7 @@ gem 'sqlite3-ruby', :require => 'sqlite3'
 # group :test do
 #   gem 'webrat'
 # end
+#group :test do
+  gem 'factory_girl', :git => "git://github.com/thoughtbot/factory_girl.git", :branch => "rails3"
+  gem 'forgery'
+#end

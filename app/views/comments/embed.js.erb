@@ -1,39 +1,73 @@
 (function($) {
   $.fn.comments = function() {
-    return this.each(function() { new $.comments(this); });
+    return this.each(function(i) {
+      new $.comments(this, new Date().getTime().toString());
+    });
   };
 
-  $.comments = function(el) {
+  $.comments = function(el, stamp) {
     this.target = $(el);
-
-    this.form = $('<form></form>').attr({
-      action: "<%= comments_url(:format => 'xml') %>",
-      method: "post"
-    });
-
-    this.token = $("<input />").attr({
-      name: 'authenticity_token', type: 'hidden',
-      value: "<%= form_authenticity_token %>"
-    });
-    this.form.append(this.token);
-
-    this.name = $("<input />").attr({ name: 'comment[name]', type: 'text' });
-    this.form.append(this.name);
-    this.name.wrap("<div class='comment_name' />");
-
-    this.body = $("<textarea />").attr({ name: 'comment[body]' });
-    this.form.append(this.body);
-    this.body.wrap("<div class='comment_body' />");
-
-    button = $("<input type='submit' value='Submit' />");
-    this.form.append(button);
-    button.wrap("<div class='comment_submit' />");
-
-    this.target.html(this.form);
+    this.stamp = stamp;
+    this.addComments();
+    this.addForm();
   }
 
   $.extend($.comments.prototype, {
-    target: null, form: null, token: null,
-    name: null, body: null
+    target: null, form: null, name: null, body: null, stamp: null,
+
+    addComments: function() {
+      $.get("<%= comments_url(:format => 'json') %>", function(data) {
+        console.log(data);
+      });
+    },
+
+    addForm: function() {
+      this.form = $('<form></form>').attr({
+        action: "<%= comments_url(:format => 'xml') %>",
+        method: "post", id: 'comments-form-'+this.stamp
+      });
+
+      $("<input />").attr({
+        name: 'authenticity_token', type: 'hidden',
+        value: "<%= form_authenticity_token %>"
+      }).appendTo(this.form);
+      $("<input />").attr({
+        name: 'comment[url]', type: 'hidden',
+        value: document.location.href
+      }).appendTo(this.form);
+
+      this.appendFormElement('text', 'name', 'Name:');
+      this.appendFormElement('textarea', 'body', 'Type your comment here.');
+      this.appendFormElement('submit', 'submit', 'Submit');
+
+      this.body.focusin(function() {
+        if ($(this).val() == "Type your comment here.") { $(this).val(""); }
+      }).focusout(function() {
+        if ($(this).val() == "") { $(this).val("Type your comment here."); }
+      });
+      this.form.bind('submit', this, function(e) {
+        if (e.data.body.val() == "Type your comment here.") { e.data.body.val(""); }
+      });
+
+      this.target.append(this.form);
+    },
+
+    appendFormElement: function(type, name, label) {
+      var id = 'comment_' + name + '_' + this.stamp;
+      var div = $('<div class="comment_'+name+'_wrap"></div>');
+      var obj = $(type == 'textarea' ? '<textarea></textarea>' : '<input type="'+type+'"></input>');
+      obj.attr({ id: id });
+
+      if (type == 'submit' || type == 'textarea' || type == 'hidden')
+        obj.val(label);
+      else if (label != null)
+        div.prepend('<label for="'+id+'">'+label+'</label>');
+
+      if (type != 'submit')
+        obj.attr('name', 'comment['+name+']');
+
+      this.form.append(div.append(obj));
+      this[name] = obj;
+    }
   });
 })(jQuery);
