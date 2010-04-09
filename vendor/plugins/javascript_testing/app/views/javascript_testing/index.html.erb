@@ -24,7 +24,7 @@
 
         test("form creation", function() {
           equals( form.length, 1 );
-          equals( form.attr('action'), "http://localhost:3000/comments.xml" );
+          equals( form.attr('action'), "http://localhost:3000/comments.json" );
           equals( form.attr('method'), "post" );
         });
 
@@ -57,14 +57,48 @@
 
         module("Comment fetcher");
 
-        asyncTest("shows 2 comments", function() {
+        asyncTest("shows <%= @count %> comments", function() {
           setTimeout(function() {
             list = obj.find('ul.comments_list');
             equals( list.length, 1 );
-            equals( list.find('li').length, 2 );
+            equals( list.find('li').length, <%= @count %> );
             start();
-          }, 300);
+          }, 500);
         });
+
+        module("Comment submission");
+
+        test("failed submission", function() {
+          var count = obj.find('ul li').length;
+          form.find('input.new_comment_name').val('Viking');
+          form.find('textarea.new_comment_body').val('');
+          form.submit();
+
+          stop();
+          setTimeout(function() {
+            list = obj.find('ul.comments_list');
+            equals( list.find('li').length, count );
+
+            ok( form.find('textarea.new_comment_body').hasClass('error') );
+            start();
+          }, 500);
+        });
+
+        test("creates comment", function() {
+          var count = obj.find('ul li').length;
+          form.find('input.new_comment_name').val('Viking');
+          form.find('textarea.new_comment_body').val('Sup yo');
+          form.submit();
+
+          stop();
+          setTimeout(function() {
+            list = obj.find('ul.comments_list');
+            equals( list.find('li').length, count + 1 );
+            ok( !form.find('textarea.new_comment_body').hasClass('error') );
+            start();
+          }, 500);
+        });
+
       });
     </script>
   </body>

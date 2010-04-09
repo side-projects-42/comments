@@ -15,7 +15,7 @@
 
   $.extend($.comments.prototype, {
     target: null, options: null, form: null, name: null, body: null,
-    list: null,
+    list: null, header: null, count: 0,
 
     addComments: function() {
       $.ajax({
@@ -27,20 +27,26 @@
         },
         success: function(data) {
           container = $('<div></div>');
+          this.header = $('<h3>Comments</h3>').appendTo(container);
           this.list = $('<ul></ul>').attr({
             id: 'comments_list_'+this.options.stamp,
             'class': 'comments_list'
-          }).append('<h3>'+data.length+' Comments</h3>').appendTo(container);
+          }).appendTo(container);
 
           var self = this;
-          $.each(data, function(i, comment) { self.appendComment(i, comment); });
+          $.each(data, function() { self.appendComment(this); });
+          this.updateHeader();
 
           this.target.prepend(container);
         }
       });
     },
 
-    appendComment: function(i, comment) {
+    updateHeader: function() {
+      this.header.html(this.count + ' Comment' + (this.count == 1 ? '' : 's'));
+    },
+
+    appendComment: function(comment) {
       item = $('<li></li>').attr({
         id: 'comment_'+comment.id, 'class': 'comment'
       });
@@ -48,11 +54,12 @@
       $('<div></div>').addClass('comment_date').html(comment.created_at).appendTo(item);
       $('<div></div>').addClass('comment_body').html(comment.body).appendTo(item);
       this.list.append(item);
+      this.count += 1;
     },
 
     addForm: function() {
       this.form = $('<form></form>').attr({
-        action: "<%= comments_url(:format => 'xml') %>",
+        action: "<%= comments_url(:format => 'json') %>",
         method: "post", id: 'comments_form_'+this.options.stamp,
         'class': 'comments_form'
       });
@@ -71,7 +78,28 @@
         if ($(this).val() == "") { $(this).val("Type your comment here."); }
       });
       this.form.bind('submit', this, function(e) {
+        var self = $(this);
         if (e.data.body.val() == "Type your comment here.") { e.data.body.val(""); }
+        $.ajax({
+          url: self.attr('action'),
+          data: self.serialize(),
+          type: 'POST',
+          context: e.data,
+          success: function(data) {
+            this.appendComment(data);
+            this.updateHeader();
+            this.form[0].reset();
+            this.form.find('*').removeClass('error');
+          },
+          error: function(xhr) {
+            data = $.parseJSON(xhr.responseText);
+            var self = this;
+            $.each(data, function(key, value) {
+              self.form.find('.new_comment_'+key).addClass('error');
+            });
+          }
+        });
+        return false;
       });
 
       this.target.append(this.form);
