@@ -1,40 +1,65 @@
 (function($) {
-  $.fn.comments = function() {
+  $.fn.comments = function(options) {
     return this.each(function(i) {
-      new $.comments(this, new Date().getTime().toString());
+      var opts = $.extend({}, options, { stamp: new Date().getTime().toString() });
+      new $.comments(this, opts);
     });
   };
 
-  $.comments = function(el, stamp) {
+  $.comments = function(el, options) {
     this.target = $(el);
-    this.stamp = stamp;
+    this.options = options;
     this.addComments();
     this.addForm();
   }
 
   $.extend($.comments.prototype, {
-    target: null, form: null, name: null, body: null, stamp: null,
+    target: null, options: null, form: null, name: null, body: null,
+    list: null,
 
     addComments: function() {
-      $.get("<%= comments_url(:format => 'json') %>", function(data) {
-        console.log(data);
+      $.ajax({
+        url: "<%= comments_url(:format => 'json') %>",
+        context: this,
+        data: {
+          site_key: this.options.siteKey,
+          url: document.location.href
+        },
+        success: function(data) {
+          container = $('<div></div>');
+          this.list = $('<ul></ul>').attr({
+            id: 'comments_list_'+this.options.stamp,
+            'class': 'comments_list'
+          }).append('<h3>'+data.length+' Comments</h3>').appendTo(container);
+
+          var self = this;
+          $.each(data, function(i, comment) { self.appendComment(i, comment); });
+
+          this.target.prepend(container);
+        }
       });
+    },
+
+    appendComment: function(i, comment) {
+      item = $('<li></li>').attr({
+        id: 'comment_'+comment.id, 'class': 'comment'
+      });
+      $('<div></div>').addClass('comment_name').html(comment.name).appendTo(item);
+      $('<div></div>').addClass('comment_date').html(comment.created_at).appendTo(item);
+      $('<div></div>').addClass('comment_body').html(comment.body).appendTo(item);
+      this.list.append(item);
     },
 
     addForm: function() {
       this.form = $('<form></form>').attr({
         action: "<%= comments_url(:format => 'xml') %>",
-        method: "post", id: 'comments-form-'+this.stamp
+        method: "post", id: 'comments_form_'+this.options.stamp,
+        'class': 'comments_form'
       });
 
-      $("<input />").attr({
-        name: 'authenticity_token', type: 'hidden',
-        value: "<%= form_authenticity_token %>"
-      }).appendTo(this.form);
-      $("<input />").attr({
-        name: 'comment[url]', type: 'hidden',
-        value: document.location.href
-      }).appendTo(this.form);
+      this.appendHiddenElement('authenticity_token', "<%= form_authenticity_token %>");
+      this.appendHiddenElement('comment[url]', document.location.href);
+      this.appendHiddenElement('comment[site_key]', this.options.siteKey);
 
       this.appendFormElement('text', 'name', 'Name:');
       this.appendFormElement('textarea', 'body', 'Type your comment here.');
@@ -52,16 +77,23 @@
       this.target.append(this.form);
     },
 
+    appendHiddenElement: function(name, value) {
+      $("<input />").attr({
+        name: name, type: 'hidden', value: value
+      }).appendTo(this.form);
+    },
+
     appendFormElement: function(type, name, label) {
-      var id = 'comment_' + name + '_' + this.stamp;
-      var div = $('<div class="comment_'+name+'_wrap"></div>');
+      var id = 'new_comment_' + name + '_' + this.options.stamp;
+      var klass = 'new_comment_' + name;
+      var div = $('<div></div>').addClass('new_comment_'+name);
       var obj = $(type == 'textarea' ? '<textarea></textarea>' : '<input type="'+type+'"></input>');
-      obj.attr({ id: id });
+      obj.attr({ id: id, 'class': klass });
 
       if (type == 'submit' || type == 'textarea' || type == 'hidden')
         obj.val(label);
       else if (label != null)
-        div.prepend('<label for="'+id+'">'+label+'</label>');
+        $('<label>'+label+'</label>').attr({'for': id, 'class': klass}).prependTo(div);
 
       if (type != 'submit')
         obj.attr('name', 'comment['+name+']');
