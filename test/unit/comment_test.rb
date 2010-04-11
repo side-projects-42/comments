@@ -38,4 +38,12 @@ class CommentTest < ActiveSupport::TestCase
     comment = Factory.build(:comment, :body => nil)
     assert !comment.valid?
   end
+
+  test "requires false akismet spam check" do
+    FakeWeb.register_uri(:post, "http://rest.akismet.com/1.1/verify-key", :body => "valid")
+    FakeWeb.register_uri(:post, 'http://abcdefg123.rest.akismet.com/1.1/comment-check', :body => 'true')
+    site = Factory(:site, :akismet_key => 'abcdefg123')
+    comment = Factory(:comment, :site => site)
+    assert comment.spam?
+  end
 end

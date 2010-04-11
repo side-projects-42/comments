@@ -15,6 +15,7 @@ ActiveRecord::Schema.define(:version => 20100408201704) do
     t.string   "name"
     t.string   "body"
     t.string   "url"
+    t.boolean  "spam"
     t.integer  "site_id"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -22,7 +23,9 @@ ActiveRecord::Schema.define(:version => 20100408201704) do
 
   create_table "sites", :force => true do |t|
     t.string   "name"
+    t.string   "url"
     t.string   "token"
+    t.string   "akismet_key"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

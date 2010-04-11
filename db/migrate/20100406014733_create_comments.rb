@@ -4,6 +4,7 @@ class CreateComments < ActiveRecord::Migration
       t.string :name
       t.string :body
       t.string :url
+      t.boolean :spam
       t.integer :site_id
 
       t.timestamps

@@ -3,7 +3,9 @@
 <table>
   <tr>
     <th>Name</th>
+    <th>URL</th>
     <th>Token</th>
+    <th>Akismet Key</th>
     <th></th>
     <th></th>
     <th></th>
@@ -12,7 +14,9 @@
 <% @sites.each do |site| %>
   <tr>
     <td><%= site.name %></td>
+    <td><%= site.url %></td>
     <td><%= site.token %></td>
+    <td><%= site.akismet_key %></td>
     <td><%= link_to 'Show', site %></td>
     <td><%= link_to 'Edit', edit_site_path(site) %></td>
     <td><%= link_to 'Destroy', site, :confirm => 'Are you sure?', :method => :delete %></td>
