@@ -3,7 +3,7 @@ class Comment < ActiveRecord::Base
   attr_protected :site_id, :spam
   before_save :check_for_spam
 
-  validates :site_id, :name, :url, :body, :presence => true
+  validates :site_id, :name, :page_url, :body, :presence => true
 
   def site_key=(key)
     self.site = Site.find_by_token(key)

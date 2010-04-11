@@ -7,11 +7,11 @@ class CommentsControllerTest < ActionController::TestCase
 
   test "should get index" do
     site = Factory(:site)
-    comment_1 = Factory(:comment, :site => site, :url => "http://example.org/foo")
-    comment_2 = Factory(:comment, :site => site, :url => "http://example.org/bar")
-    comment_3 = Factory(:comment, :url => "http://example.org/foo")
+    comment_1 = Factory(:comment, :site => site, :page_url => "http://example.org/foo")
+    comment_2 = Factory(:comment, :site => site, :page_url => "http://example.org/bar")
+    comment_3 = Factory(:comment, :page_url => "http://example.org/foo")
 
-    get :index, :format => :json, :site_key => site.token, :url => "http://example.org/foo"
+    get :index, :format => :json, :site_key => site.token, :page_url => "http://example.org/foo"
     assert_response :success
     assert_equal [comment_1], assigns(:comments)
   end

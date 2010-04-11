@@ -13,8 +13,12 @@ ActiveRecord::Schema.define(:version => 20100408201704) do
 
   create_table "comments", :force => true do |t|
     t.string   "name"
+    t.string   "author_url"
+    t.string   "email"
+    t.string   "ip"
+    t.string   "agent"
     t.string   "body"
-    t.string   "url"
+    t.string   "page_url"
     t.boolean  "spam"
     t.integer  "site_id"
     t.datetime "created_at"

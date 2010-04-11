@@ -23,7 +23,7 @@
         context: this,
         data: {
           site_key: this.options.siteKey,
-          url: document.location.href
+          page_url: document.location.href
         },
         success: function(data) {
           container = $('<div></div>');
@@ -65,7 +65,7 @@
       });
 
       this.appendHiddenElement('authenticity_token', "<%= form_authenticity_token %>");
-      this.appendHiddenElement('comment[url]', document.location.href);
+      this.appendHiddenElement('comment[page_url]', document.location.href);
       this.appendHiddenElement('comment[site_key]', this.options.siteKey);
 
       this.appendFormElement('text', 'name', 'Name:');

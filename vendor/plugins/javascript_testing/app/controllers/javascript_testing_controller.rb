@@ -2,11 +2,16 @@ class JavascriptTestingController < ApplicationController
   layout nil
 
   def index
+    this_url = url_for(:controller => 'javascript_testing', :action => 'index', :count => params[:count], :only_path => false)
+
     @count = params.has_key?(:count) ? params[:count].to_i : 2
-    @site = Site.find_or_create_by_name('Javascript Testing')
+    @site = Site.find_by_name('Javascript Testing')
+    if @site.nil?
+      @site = Site.create(:name => 'Javascript Testing', :url => this_url)
+    end
 
     Comment.where(:site_id => @site.id).delete_all
-    opts = {:url => url_for(:controller => 'javascript_testing', :action => 'index', :count => params[:count], :only_path => false), :site_key => @site.token}
+    opts = {:page_url => this_url, :site_key => @site.token}
     names = %w{Terrence Phillip}
     terms = %w{friend buddy guy}
     @count.times do |i|

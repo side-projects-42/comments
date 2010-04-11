@@ -2,7 +2,7 @@ require 'test_helper'
 
 class SitesControllerTest < ActionController::TestCase
   setup do
-    @site = sites(:one)
+    @site = Factory(:site)
   end
 
   test "should get index" do
@@ -18,7 +18,7 @@ class SitesControllerTest < ActionController::TestCase
 
   test "should create site" do
     assert_difference('Site.count') do
-      post :create, :site => @site.attributes
+      post :create, :site => Factory.attributes_for(:site)
     end
 
     assert_redirected_to site_path(assigns(:site))

@@ -42,8 +42,8 @@
           equals( key.val(), "<%= @site.token %>" );
         });
 
-        test("url", function() {
-          url = form.find('input[name="comment[url]"]');
+        test("page url", function() {
+          url = form.find('input[name="comment[page_url]"]');
           equals( url.length, 1 );
           equals( url.attr('type'), 'hidden' );
           equals( url.val(), document.location.href );
@@ -63,7 +63,7 @@
             equals( list.length, 1 );
             equals( list.find('li').length, <%= @count %> );
             start();
-          }, 500);
+          }, 700);
         });
 
         module("Comment submission");
@@ -81,7 +81,7 @@
 
             ok( form.find('textarea.new_comment_body').hasClass('error') );
             start();
-          }, 500);
+          }, 700);
         });
 
         test("creates comment", function() {
@@ -96,7 +96,7 @@
             equals( list.find('li').length, count + 1 );
             ok( !form.find('textarea.new_comment_body').hasClass('error') );
             start();
-          }, 500);
+          }, 700);
         });
 
       });

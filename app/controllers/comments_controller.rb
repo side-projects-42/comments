@@ -3,7 +3,7 @@ class CommentsController < ApplicationController
   # GET /comments.xml
   def index
     @site = Site.find_by_token(params[:site_key])
-    @comments = @site ? @site.comments.where(:url => params[:url]).all : []
+    @comments = @site ? @site.comments.where(:page_url => params[:page_url]).all : []
 
     respond_to do |format|
       format.html # index.html.erb
