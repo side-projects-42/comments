@@ -1,4 +1,6 @@
 class CommentsController < ApplicationController
+  skip_before_filter :verify_authenticity_token
+
   # GET /comments
   # GET /comments.xml
   def index
@@ -43,6 +45,9 @@ class CommentsController < ApplicationController
   # POST /comments.xml
   def create
     @comment = Comment.new(params[:comment])
+    @comment.ip = request.remote_ip
+    @comment.agent = request.user_agent
+    @comment.referrer = request.referrer
 
     respond_to do |format|
       if @comment.save

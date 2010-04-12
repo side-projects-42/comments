@@ -15,8 +15,8 @@ class JavascriptTestingController < ApplicationController
     names = %w{Terrence Phillip}
     terms = %w{friend buddy guy}
     @count.times do |i|
-      @site.comments.create(opts.merge({
-        :name => names[i % names.length],
+      @site.comments.create!(opts.merge({
+        :name => names[i % names.length], :ip => '10.1.2.3', :agent => 'Leet Browser',
         :body => "I'm not your #{terms[i % terms.length]}, #{terms[(i % terms.length)-1]}!"
       }))
     end

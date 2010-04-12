@@ -23,6 +23,9 @@ class CommentsControllerTest < ActionController::TestCase
 
   test "should create comment" do
     site = Factory(:site)
+    @request.remote_addr = '10.1.2.3'
+    @request.user_agent = 'Leet Browser'
+    @request.env['HTTP_REFERER'] = 'http://example.org'
     assert_difference('Comment.count') do
       post :create, {
         :format => 'json',
@@ -30,7 +33,12 @@ class CommentsControllerTest < ActionController::TestCase
       }
     end
     assert_response :success
-    assert_equal site, assigns(:comment).site
+
+    comment = assigns(:comment)
+    assert_equal site, comment.site
+    assert_equal '10.1.2.3', comment.ip
+    assert_equal 'Leet Browser', comment.agent
+    assert_equal 'http://example.org', comment.referrer
   end
 
   test "failed comment creation" do
